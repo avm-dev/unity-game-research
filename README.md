@@ -1,10 +1,12 @@
 # unity-game-research
 
-Research an extracted Unity game and generate reusable notes about its systems, mechanics, and architecture.
+Research an extracted Unity game and generate reusable, evidence-backed notes about its systems, mechanics, and architecture.
+
+`unity-game-research` helps an agent inspect a Unity client and produce notes that can be reused and extended later instead of recreated from scratch.
 
 ## What This Skill Does
 
-Use this skill when you want an agent to inspect a Unity game build and write evidence-backed notes about specific topics such as:
+Use this skill when you want an agent to study topics such as:
 
 - economy and progression
 - combat and skills
@@ -12,19 +14,19 @@ Use this skill when you want an agent to inspect a Unity game build and write ev
 - networking and validation
 - class architecture behind a subsystem
 
-The skill works with extracted Unity client files and supports both Mono and IL2CPP layouts. Its output is a reusable `game-knowledge/` folder with notes that can be updated later instead of recreated from scratch.
+The skill works with extracted Unity client files and supports both Mono and IL2CPP layouts. Its output is a reusable `game-knowledge/` folder.
 
 ## Requirements
 
 - A compatible client such as Claude Code or Codex
-- Local filesystem access
+- Local filesystem access to the extracted game
 - `python3` for the checkpoint script
 
 ## Install
 
-Choose the install method that is most convenient for you.
+Choose the installation method that fits your setup.
 
-## Quick Install
+### Install with Skills CLI
 
 If you already use the Skills CLI, this is the shortest path:
 
@@ -36,11 +38,11 @@ Repository URL:
 
 `https://github.com/avm-dev/unity-game-research`
 
-## Install With Git Clone
+### Install with Git Clone
 
 Clone the repository into the skills directory used by your client.
 
-Generic Agent Skills location:
+Codex and generic agent skills directory:
 
 ```bash
 git clone https://github.com/avm-dev/unity-game-research.git ~/.agents/skills/unity-game-research
@@ -52,13 +54,7 @@ Claude Code:
 git clone https://github.com/avm-dev/unity-game-research.git ~/.claude/skills/unity-game-research
 ```
 
-Codex:
-
-```bash
-git clone https://github.com/avm-dev/unity-game-research.git ~/.agents/skills/unity-game-research
-```
-
-## Install By Downloading The Folder
+### Install by Downloading the Folder
 
 If you do not want to use `npx` or `git`, download the repository as a ZIP, extract it, and place the folder in one of these locations:
 
@@ -69,13 +65,13 @@ If you do not want to use `npx` or `git`, download the repository as a ZIP, extr
 
 Ask the agent to use `unity-game-research` and name the system you want to study.
 
-Examples:
+Example prompts:
 
 - `Use unity-game-research. Study economy and progression.`
 - `Use unity-game-research. Study the skill system.`
 - `Use unity-game-research. Reconstruct the class architecture behind hero movement.`
 
-What you do not need to spell out:
+You do not need to spell out:
 
 - output folder
 - checkpoint creation
@@ -92,6 +88,8 @@ What you do not need to spell out:
 - `agents/`: optional client metadata
 
 ## Validation
+
+Run the local checks with:
 
 ```bash
 python3 -m unittest discover -s tests -v
