@@ -98,10 +98,6 @@ python3 -m unittest discover -s tests -v
 skills-ref validate ./
 ```
 
-## Publishing
-
-- See `PUBLISHING.md` for the GitHub publishing flow, directory submission, and optional webhook sync.
-
 ## Portability Notes
 
 - Do not hardcode machine-specific paths.
