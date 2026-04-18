@@ -557,7 +557,9 @@ def build_install_plan(
 
     lines.append("## Policy")
     lines.append("")
+    lines.append("- This install plan is optional guidance only.")
     lines.append("- Installation requires explicit user approval.")
+    lines.append("- Continue with available fallbacks when installation is not approved.")
     lines.append("- After installation, rerun the checkpoint script with `--refresh-raw` to refresh readiness and recovery plans.")
     return lines
 

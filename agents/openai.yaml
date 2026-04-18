@@ -1,4 +1,4 @@
 interface:
   display_name: "Unity Game Research"
-  short_description: "Study a Unity game and write design docs."
-  default_prompt: "Study the Unity game in the current folder, extract evidence about its systems and mechanics, and build a game-knowledge folder with gamedesign documents."
+  short_description: "Investigate a Unity game and write reusable research notes."
+  default_prompt: "Investigate the Unity game in the current folder, recover evidence about the requested systems, and build or update a game-knowledge dossier with reusable notes."

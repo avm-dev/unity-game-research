@@ -1,56 +1,32 @@
 ---
 name: unity-game-research
-description: Study a Unity game from the current working folder or a user-specified extracted game directory, collect technical evidence, infer gameplay systems, and write or update a reusable `game-knowledge/` dossier. Use when the user wants Codex to research one or more game systems end-to-end with minimal prompting, for example economy, progression, combat, monetization, hero movement, skills, inventory, quests, guild, networking, or any other specific subsystem. The user should only need to name the topics to study; Codex should handle detection, extraction, indexing, resume, and document generation automatically.
+description: Use when an agent needs to investigate an extracted Unity game, recover evidence from Mono or IL2CPP artifacts, and write reusable notes about specific gameplay systems such as economy, progression, combat, skills, inventory, networking, or monetization.
+license: MIT
+compatibility: Works in Agent Skills compatible clients with local filesystem access. Python 3 is recommended for the checkpoint script.
 ---
 
 # Unity Game Research
 
 ## Overview
 
-Run the whole investigation as one job. Start from the current folder unless the user gives another path, detect the Unity build layout, gather evidence, resume prior work automatically, and produce design documents that another agent can use for Q&A about the game.
+Investigate an extracted Unity game from the current working directory or from a user-provided path. Build or refresh a reusable `game-knowledge/` dossier with evidence-backed notes about only the systems the user asked to study.
 
 ## Default Behavior
 
-- Treat the current working directory as the input root when the user says "here", "this folder", or gives no path.
-- Write output to `./game-knowledge/` unless the user specifies another destination.
-- If `game-knowledge/` already exists, resume from it and update in place without deleting unrelated user files.
-- Prefer read-only analysis of the source tree. Do not move, rename, or modify original game artifacts.
-- If the folder is not clearly a Unity game, say so early and stop before inventing a dossier.
-- Treat extraction, indexing, and resume as internal responsibilities of the skill. Do not ask the user to request them explicitly.
-- Assume the user will only name the systems to study. Infer all other operational steps yourself.
+- Treat the current working directory as the input root unless the user gives another path.
+- Write outputs to `./game-knowledge/` unless the user specifies another destination.
+- Resume from an existing `game-knowledge/` directory when possible.
+- Prefer read-only analysis of the source tree and do not modify original game artifacts.
+- Stop early if the folder does not look like a Unity game.
+- Treat extraction, indexing, and resume as internal responsibilities of the skill.
 
-## User Contract
+## Core Workflow
 
-Assume the user's request will look like one of these:
-
-- `Use $unity-game-research. Study economy, progression, and monetization.`
-- `Use $unity-game-research. Study hero movement on the battlefield.`
-- `Use $unity-game-research. Study the skill system.`
-
-Do not require the user to mention:
-
-- current folder
-- output folder
-- resume behavior
-- extraction or indexing
-- backend detection
-- local tools
-- evidence policy
-
-Those are part of the skill.
-
-## Internal Phases
-
-Run these phases automatically and resume from the latest completed checkpoint when possible:
-
-1. Confirm Unity markers anywhere in the discovered tree:
+1. Confirm Unity markers in the discovered tree:
    - `assets/bin/Data/`
    - `assets/bin/Data/Managed/`
    - `assets/bin/Data/il2cpp_data/`
    - search the tree for `libil2cpp.so`, `libunity.so`, and `global-metadata.dat`
-   - `libunity.so`
-   - `libil2cpp.so`
-   - `global-metadata.dat`
    - `globalgamemanagers`, `resources.assets`, `sharedassets*.assets`
 2. Classify the scripting backend:
    - managed/Mono if game assemblies exist in `Managed/`
@@ -64,7 +40,7 @@ Run these phases automatically and resume from the latest completed checkpoint w
    - managed assemblies or IL2CPP recovery outputs
    - strings, endpoints, config blobs, enum names, type names
    - asset names, prefab names, scene names, resources, localization data
-5. Convert large raw outputs into compact indexes before doing substantial reasoning.
+5. Convert large raw outputs into compact indexes before substantial reasoning.
 6. Infer gameplay systems only from evidence. Separate facts from interpretation.
 7. Write or update only the topic documents requested by the user, then refresh shared summary files as needed.
 
@@ -72,7 +48,7 @@ Run these phases automatically and resume from the latest completed checkpoint w
 
 - If `game-knowledge/progress.yaml` exists, read it first.
 - Do not redo expensive extraction if matching `raw/` and `indexes/` artifacts already exist and still cover the requested topics.
-- If the user asks for a new topic a week later, continue from prior checkpoints instead of starting over.
+- If the user asks for a new topic later, continue from prior checkpoints instead of starting over.
 - Only rebuild stale or missing phases.
 - Preserve previous topic documents unless new evidence contradicts them.
 - Record each researched topic in `progress.yaml`.
@@ -174,43 +150,11 @@ Recommended priority order:
 
 When useful, create or update a compact topic cache under `indexes/topics/<slug>.md` so later sessions can resume without re-reading multiple indexes.
 
-## Developer Reconstruction Mode
+## Specialized Modes
 
-If the user asks to reconstruct a mechanic as a developer, recover the programming architecture rather than only a gamedesign description.
-
-Typical requests:
-
-- `Use $unity-game-research. Reconstruct the programming class architecture for the skill system.`
-- `Use $unity-game-research. Reconstruct the programming class architecture for hero movement on the battlefield.`
-
-In this mode, prioritize:
-
-- key classes and namespaces
-- inheritance and interfaces
-- responsibilities of each class
-- method flow and call sequence
-- state flow and data ownership
-- service, controller, manager, model, and config relationships
-- reimplementation notes and unresolved gaps
-
-Prefer `indexes/types-index.md`, `indexes/native-symbols.md`, `indexes/strings-by-topic.md`, and relevant existing topic caches before broader dossier files.
-
-## Dual-Perspective Mode
-
-If the user asks for both gamedesign understanding and developer reconstruction for the same topic, produce both views without broadening the topic scope.
-
-Typical requests:
-
-- `Use $unity-game-research. Study the skill system from both a gamedesign and programming architecture perspective.`
-- `Use $unity-game-research. Study hero movement on the battlefield from both a gamedesign and developer reconstruction perspective.`
-
-In this mode:
-
-- keep the research focused on one requested topic unless the user explicitly names several
-- write the player-facing/system-design explanation in `topics/<slug>.md`
-- write the code-architecture view in `topics/<slug>-architecture.md`
-- write `topics/<slug>-reimplementation.md` when the evidence is sufficient to propose a reimplementation path
-- share evidence across both documents instead of duplicating broad extraction work
+- For developer reconstruction requests, use `references/developer-reconstruction.md`.
+- For weak or partial evidence, use `references/mechanics-inference-guide.md`.
+- For dossier layout and checkpoint file expectations, use `references/dossier-schema.md` and `references/progress-schema.md`.
 
 ## Evidence Rules
 
@@ -317,40 +261,6 @@ For dual-perspective requests:
 - keep `topics/<slug>-architecture.md` focused on classes, responsibilities, relationships, and flows
 - avoid merging both views into one bloated document unless the topic is tiny
 
-## Reimplementation Feasibility
-
-Assess reimplementation feasibility before creating `topics/<slug>-reimplementation.md`.
-
-Use these levels:
-
-- `high`: create `topics/<slug>-reimplementation.md`
-- `medium`: keep reimplementation notes inside `topics/<slug>-architecture.md`
-- `low`: do not propose a concrete reimplementation beyond high-level observations
-
-Mark feasibility as `high` only when at least 4 of these 6 conditions are satisfied:
-
-1. key classes for the subsystem are identified
-2. the main execution or method flow is understood
-3. state ownership is reasonably clear
-4. rules/config/data inputs are visible
-5. class relationships are identifiable
-6. remaining unknowns are narrow and localized
-
-Treat any of these as red flags that should usually force `medium` or `low`:
-
-- severe obfuscation with no reliable role recovery
-- no clear execution flow
-- unclear state ownership
-- evidence is mostly strings or UI labels
-- the subsystem appears mostly server-authoritative
-- facts and guesses cannot be cleanly separated
-
-When feasibility is not `high`, add a short section to `topics/<slug>-architecture.md`:
-
-- `Reimplementation Feasibility`
-- `What Is Missing`
-- `What Could Be Safely Recreated`
-
 ## Scope Requests
 
 If the user asks for one or more specific systems:
@@ -360,8 +270,8 @@ If the user asks for one or more specific systems:
 3. Do not spend time producing unrelated system documents unless strong evidence is already available at near-zero extra cost.
 4. Treat a narrow request as permission to go deep, not broad.
 5. If only one topic was requested, keep the pass single-topic unless blocking dependencies force a small amount of adjacent context.
-6. If the request is framed as implementation or reconstruction work, switch to developer reconstruction mode automatically.
-7. If the request explicitly asks for both design and code architecture, switch to dual-perspective mode automatically.
+6. If the request is framed as implementation or reconstruction work, switch to the developer reconstruction guidance from `references/developer-reconstruction.md`.
+7. If the request explicitly asks for both design and code architecture, produce both views without broadening the topic scope.
 
 ## Escalation Path
 
@@ -382,7 +292,7 @@ Expect frequent evidence for:
 - PvE and PvP rules
 - events, daily tasks, and retention loops
 - monetization and live-ops
-- client/server authority boundaries
+- client-versus-server authority boundaries
 
 For live data or packed content, fall back to generic mobile signatures like `UnityCache/Shared`, `cache`, `files`, `AssetBundle`, `BundleFiles`, `__data`, or bundle-like files when the exact container layout is unclear.
 
@@ -402,12 +312,12 @@ Treat client checks as local hints only when the server can still override the f
 
 ## References
 
-- Read `references/dossier-schema.md` for the expected output tree and field meanings.
-- Read `references/mechanics-inference-guide.md` when extracting mechanics from weak or partial evidence.
-- Read `references/progress-schema.md` when creating or updating checkpoint files.
-- Use `scripts/unity_research_checkpoint.py` to materialize checkpoint artifacts before substantial LLM reasoning.
-- Read `references/tool-adapters.md` when deciding how to use available local reverse-engineering tools and fallbacks.
-- Read `references/developer-reconstruction.md` when the user wants class architecture, flows, dependencies, or reimplementation guidance.
+- Read `references/dossier-schema.md` for the expected dossier layout.
+- Read `references/progress-schema.md` for checkpoint file structure.
+- Read `references/mechanics-inference-guide.md` when evidence is weak or partial.
+- Read `references/developer-reconstruction.md` for architecture-focused reconstruction requests.
+- Use `scripts/unity_research_checkpoint.py` before substantial reasoning when checkpoint artifacts are missing or stale.
+- Read `references/tool-adapters.md` when selecting local reverse-engineering tools or fallbacks.
 
 ## Capability Notes
 

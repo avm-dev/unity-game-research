@@ -1,52 +1,108 @@
 # unity-game-research
 
-Portable Codex skill for researching Unity games from extracted client files.
+Research an extracted Unity game and generate reusable notes about its systems, mechanics, and architecture.
 
-## What It Includes
+## What This Skill Does
 
-- `SKILL.md`
-- `agents/`
-- `references/`
-- `scripts/`
-- `tests/`
+Use this skill when you want an agent to inspect a Unity game build and write evidence-backed notes about specific topics such as:
+
+- economy and progression
+- combat and skills
+- inventory and monetization
+- networking and validation
+- class architecture behind a subsystem
+
+The skill works with extracted Unity client files and supports both Mono and IL2CPP layouts. Its output is a reusable `game-knowledge/` folder with notes that can be updated later instead of recreated from scratch.
 
 ## Requirements
 
-- Codex with local skill support
-- `python3` for the checkpoint script and tests
+- A compatible client such as Claude Code or Codex
+- Local filesystem access
+- `python3` for the checkpoint script
 
 ## Install
 
-Copy this directory into your Codex skills directory as `unity-game-research`.
+Choose the install method that is most convenient for you.
 
-Example target:
-- `$CODEX_HOME/skills/unity-game-research`
+## Quick Install
+
+If you already use the Skills CLI, this is the shortest path:
+
+```bash
+npx skills add avm-dev/unity-game-research
+```
+
+Repository URL:
+
+`https://github.com/avm-dev/unity-game-research`
+
+## Install With Git Clone
+
+Clone the repository into the skills directory used by your client.
+
+Generic Agent Skills location:
+
+```bash
+git clone https://github.com/avm-dev/unity-game-research.git ~/.agents/skills/unity-game-research
+```
+
+Claude Code:
+
+```bash
+git clone https://github.com/avm-dev/unity-game-research.git ~/.claude/skills/unity-game-research
+```
+
+Codex:
+
+```bash
+git clone https://github.com/avm-dev/unity-game-research.git ~/.agents/skills/unity-game-research
+```
+
+## Install By Downloading The Folder
+
+If you do not want to use `npx` or `git`, download the repository as a ZIP, extract it, and place the folder in one of these locations:
+
+- `~/.agents/skills/unity-game-research`
+- `~/.claude/skills/unity-game-research`
 
 ## Use
 
-Reference the skill as `unity-game-research` from Codex when you want to research
-an extracted Unity game. The main workflow and expected outputs are documented in
-`SKILL.md`.
+Ask the agent to use `unity-game-research` and name the system you want to study.
 
-## Main Use Cases
+Examples:
 
-- Unity IL2CPP or Mono layout detection
-- gameplay system research
-- client validation and networking surface analysis
-- generic cache and downloaded-bundle candidate discovery
-- reusable dossier generation for later Q&A or reverse-engineering passes
+- `Use unity-game-research. Study economy and progression.`
+- `Use unity-game-research. Study the skill system.`
+- `Use unity-game-research. Reconstruct the class architecture behind hero movement.`
 
-## Repo Layout
+What you do not need to spell out:
+
+- output folder
+- checkpoint creation
+- indexing
+- resume behavior
+- backend detection
+
+## Repository Layout
 
 - `SKILL.md`: main skill instructions
-- `scripts/unity_research_checkpoint.py`: lightweight checkpoint/index builder
-- `references/`: supporting guidance for dossier structure and adapters
-- `tests/`: regression tests for portability-sensitive behavior
-- `agents/`: agent metadata used by the skill
+- `scripts/unity_research_checkpoint.py`: checkpoint and index builder
+- `references/`: supporting research guides and schemas
+- `tests/`: portability and regression tests
+- `agents/`: optional client metadata
+
+## Validation
+
+```bash
+python3 -m unittest discover -s tests -v
+skills-ref validate ./
+```
+
+## Publishing
+
+- See `PUBLISHING.md` for the GitHub publishing flow, directory submission, and optional webhook sync.
 
 ## Portability Notes
-
-This package is intended to stay portable.
 
 - Do not hardcode machine-specific paths.
 - Do not hardcode project-specific package names or extracted game paths.

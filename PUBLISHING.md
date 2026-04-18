@@ -1,50 +1,50 @@
 # Publishing
 
-## What This Folder Is
+## Repository Checklist
 
-This directory is the GitHub-ready repository payload. Its top level should contain:
+Before publishing, confirm:
 
-- `SKILL.md`
-- `agents/`
-- `references/`
-- `scripts/`
-- `tests/`
-- `README.md`
-- `.gitignore`
-- `LICENSE`
-- `PUBLISHING.md`
+- the repository is public
+- `SKILL.md` is present at the repository root
+- the `name` field matches the directory name
+- the skill description is agent-neutral
+- local tests pass
+- `skills-ref validate ./` passes
+
+## Local Validation
+
+```bash
+python3 -m unittest discover -s tests -v
+skills-ref validate ./
+```
 
 ## Initialize Git
-
-Run these commands from this directory:
 
 ```bash
 git init
 git add .
 git commit -m "Initial publish of unity-game-research"
+git branch -M main
 ```
 
 ## Create GitHub Repo With `gh`
 
 ```bash
-git branch -M main
 gh repo create unity-game-research --public --source=. --remote=origin --push
 ```
 
-## Manual GitHub Remote Flow
+## Submit To The Directory
 
-If you create the repository in the GitHub UI first:
+Submit the public repository URL at:
 
-```bash
-git init
-git add .
-git commit -m "Initial publish of unity-game-research"
-git branch -M main
-```
+- `https://agentskill.sh/submit`
 
-Then copy the SSH or HTTPS remote command shown by GitHub for the empty
-repository and run it from this same directory, followed by:
+The directory will scan the repository for `SKILL.md` files and import them.
 
-```bash
-git push -u origin main
-```
+## Optional Instant Sync
+
+For faster updates, add a GitHub webhook:
+
+- Payload URL: `https://agentskill.sh/api/webhooks/github`
+- Content type: `application/json`
+- Events: `push` only
